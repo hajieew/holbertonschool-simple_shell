@@ -7,7 +7,7 @@
 extern char **environ;
 
 /**
- * main - simple UNIX shell (Task 1)
+ * main - simple UNIX shell
  *
  * Return: Always 0
  */
@@ -26,7 +26,7 @@ int main(void)
     {
         if (isatty(STDIN_FILENO))
         {
-            printf("#cisfun$ ");
+            printf("newshell$ ");
             fflush(stdout);
         }
 
@@ -58,7 +58,7 @@ int main(void)
         {
             if (execve(argv[0], argv, environ) == -1)
             {
-                perror("./hsh");
+                fprintf(stderr, "Command not found\n");
                 exit(1);
             }
         }
