@@ -6,46 +6,75 @@
 
 extern char **environ;
 
-int main(void) {
-    char *input_line = NULL;
+/**
+ * main - simple UNIX shell (Task 1)
+ *
+ * Return: Always 0
+ */
+int main(void)
+{
+    char *line = NULL;
     size_t len = 0;
-    char *args[100];
+    ssize_t nread;
     pid_t pid;
     int status;
+    char *argv[100]; /* supports up to 99 arguments + NULL */
+    char *token;
+    int i;
 
-    while(1) {
-        if(isatty(STDIN_FILENO))
-            printf("$ ");
-
-        if(getline(&input_line, &len, stdin) == -1) {
-            printf("\nBye!\n");
-            break;
+    while (1)
+    {
+        /* Display prompt only in interactive mode */
+        if (isatty(STDIN_FILENO))
+        {
+            printf("#cisfun$ ");
+            fflush(stdout);
         }
 
-        // Remove newline
-        input_line[strcspn(input_line, "\n")] = 0;
-
-        int arg_count = 0;
-        char *word = strtok(input_line, " \t");
-        while(word && arg_count < 99) {
-            args[arg_count++] = word;
-            word = strtok(NULL, " \t");
+        /* Read a line from stdin */
+        nread = getline(&line, &len, stdin);
+        if (nread == -1) /* Ctrl+D or EOF */
+        {
+            free(line);
+            exit(0);
         }
-        args[arg_count] = NULL;
 
-        if(!args[0]) continue;
+        /* Remove trailing newline */
+        if (line[nread - 1] == '\n')
+            line[nread - 1] = '\0';
 
+        /* Skip empty lines (spaces/tabs only) */
+        i = 0;
+        token = strtok(line, " \t");
+        while (token != NULL && i < 99)
+        {
+            argv[i++] = token;
+            token = strtok(NULL, " \t");
+        }
+        argv[i] = NULL;
+
+        if (argv[0] == NULL)
+            continue; /* boş line varsa heç nə etmir */
+
+        /* Fork a child process */
         pid = fork();
-        if(pid == 0) {
-            if(execve(args[0], args, environ) == -1) {
-                fprintf(stderr, "Can't run '%s'\n", args[0]);
+
+        if (pid == 0)
+        {
+            /* Child process: execute command */
+            if (execve(argv[0], argv, environ) == -1)
+            {
+                perror("./hsh");
                 exit(1);
             }
-        } else {
+        }
+        else
+        {
+            /* Parent process: wait for child */
             wait(&status);
         }
     }
 
-    free(input_line);
-    return 0;
+    free(line);
+    return (0);
 }
