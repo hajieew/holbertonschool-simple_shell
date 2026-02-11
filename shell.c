@@ -3,8 +3,6 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-#define MAX_LINE 1024
-
 extern char **environ;
 
 /**
@@ -19,6 +17,7 @@ int main(void)
     ssize_t nread;
     pid_t pid;
     int status;
+    char *argv[2];
 
     while (1)
     {
@@ -36,15 +35,19 @@ int main(void)
         if (line[nread - 1] == '\n')
             line[nread - 1] = '\0';
 
+        if (line[0] == '\0')
+            continue;
+
+        argv[0] = line;
+        argv[1] = NULL;
+
         pid = fork();
 
         if (pid == 0)
         {
-            char *argv[] = {line, NULL};
-
             if (execve(line, argv, environ) == -1)
             {
-                perror("./shell");
+                perror("./hsh");
                 exit(1);
             }
         }
