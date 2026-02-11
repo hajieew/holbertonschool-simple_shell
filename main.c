@@ -3,7 +3,7 @@
 /**
  * main - prints Holberton
  *
- * Returns always 0
+ * Return: Always 0
  */
 int main(void)
 {
