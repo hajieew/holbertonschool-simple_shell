@@ -6,7 +6,7 @@
 extern char **environ;
 
 /**
- * main - simple shell
+ * main - simple UNIX shell (Task 0)
  *
  * Return: Always 0
  */
@@ -21,31 +21,40 @@ int main(void)
 
     while (1)
     {
-        printf("#cisfun$ ");
-        fflush(stdout);
+        /* Display prompt only in interactive mode */
+        if (isatty(STDIN_FILENO))
+        {
+            printf("#cisfun$ ");
+            fflush(stdout);
+        }
 
+        /* Read a line from stdin */
         nread = getline(&line, &len, stdin);
-        if (nread == -1)
+        if (nread == -1) /* Ctrl+D or EOF */
         {
             free(line);
             exit(0);
         }
 
-        /* remove newline */
+        /* Remove trailing newline */
         if (line[nread - 1] == '\n')
             line[nread - 1] = '\0';
 
+        /* Skip empty lines */
         if (line[0] == '\0')
             continue;
 
+        /* Prepare argv array for execve */
         argv[0] = line;
         argv[1] = NULL;
 
+        /* Fork a child process */
         pid = fork();
 
         if (pid == 0)
         {
-            if (execve(line, argv, environ) == -1)
+            /* Child process: execute command */
+            if (execve(argv[0], argv, environ) == -1)
             {
                 perror("./hsh");
                 exit(1);
@@ -53,6 +62,7 @@ int main(void)
         }
         else
         {
+            /* Parent process: wait for child */
             wait(&status);
         }
     }
