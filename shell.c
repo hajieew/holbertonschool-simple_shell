@@ -18,32 +18,28 @@ int main(void)
     ssize_t nread;
     pid_t pid;
     int status;
-    char *argv[100]; /* supports up to 99 arguments + NULL */
+    char *argv[100];
     char *token;
     int i;
 
     while (1)
     {
-        /* Display prompt only in interactive mode */
         if (isatty(STDIN_FILENO))
         {
             printf("#cisfun$ ");
             fflush(stdout);
         }
 
-        /* Read a line from stdin */
         nread = getline(&line, &len, stdin);
-        if (nread == -1) /* Ctrl+D or EOF */
+        if (nread == -1)
         {
             free(line);
             exit(0);
         }
 
-        /* Remove trailing newline */
         if (line[nread - 1] == '\n')
             line[nread - 1] = '\0';
 
-        /* Skip empty lines (spaces/tabs only) */
         i = 0;
         token = strtok(line, " \t");
         while (token != NULL && i < 99)
@@ -54,14 +50,12 @@ int main(void)
         argv[i] = NULL;
 
         if (argv[0] == NULL)
-            continue; /* boş line varsa heç nə etmir */
+            continue;
 
-        /* Fork a child process */
         pid = fork();
 
         if (pid == 0)
         {
-            /* Child process: execute command */
             if (execve(argv[0], argv, environ) == -1)
             {
                 perror("./hsh");
@@ -70,7 +64,6 @@ int main(void)
         }
         else
         {
-            /* Parent process: wait for child */
             wait(&status);
         }
     }
