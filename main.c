@@ -1,4 +1,12 @@
-nothing yet
+#include <stdio.h>
+
 /**
- * Try
+ * main - prints Holberton
+ *
+ * Returns always 0
  */
+int main(void)
+{
+	printf("Holberton\n");
+	return (0);
+}
