@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 #include <sys/wait.h>
 
 extern char **environ;
 
 /**
- * main - simple UNIX shell (Task 0)
+ * main - simple UNIX shell (Task 1)
  *
  * Return: Always 0
  */
@@ -17,7 +18,9 @@ int main(void)
     ssize_t nread;
     pid_t pid;
     int status;
-    char *argv[2];
+    char *argv[100]; /* supports up to 99 arguments + NULL */
+    char *token;
+    int i;
 
     while (1)
     {
@@ -44,9 +47,15 @@ int main(void)
         if (line[0] == '\0')
             continue;
 
-        /* Prepare argv array for execve */
-        argv[0] = line;
-        argv[1] = NULL;
+        /* Tokenize the line into argv */
+        i = 0;
+        token = strtok(line, " \t");
+        while (token != NULL && i < 99)
+        {
+            argv[i++] = token;
+            token = strtok(NULL, " \t");
+        }
+        argv[i] = NULL;
 
         /* Fork a child process */
         pid = fork();
@@ -67,5 +76,6 @@ int main(void)
         }
     }
 
+    free(line);
     return (0);
 }
