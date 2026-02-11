@@ -43,11 +43,7 @@ int main(void)
         if (line[nread - 1] == '\n')
             line[nread - 1] = '\0';
 
-        /* Skip empty lines */
-        if (line[0] == '\0')
-            continue;
-
-        /* Tokenize the line into argv */
+        /* Skip empty lines (spaces/tabs only) */
         i = 0;
         token = strtok(line, " \t");
         while (token != NULL && i < 99)
@@ -56,6 +52,9 @@ int main(void)
             token = strtok(NULL, " \t");
         }
         argv[i] = NULL;
+
+        if (argv[0] == NULL)
+            continue; /* boş line varsa heç nə etmir */
 
         /* Fork a child process */
         pid = fork();
