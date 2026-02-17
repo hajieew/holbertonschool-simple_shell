@@ -5,6 +5,7 @@
 #include <sys/wait.h>
 
 extern char **environ;
+
 /**
  * find_command - finds full path of a command using PATH
  * @command: command name
@@ -16,7 +17,6 @@ char *find_command(char *command)
     char *path_env, *path_copy, *dir;
     static char full_path[1024];
 
-    /* If command contains '/', check directly */
     if (strchr(command, '/'))
     {
         if (access(command, X_OK) == 0)
@@ -66,6 +66,7 @@ int main(void)
     char *argv[100];
     char *token;
     int i;
+    char *cmd_path;
 
     while (1)
     {
@@ -87,6 +88,7 @@ int main(void)
 
         i = 0;
         token = strtok(line, " \t");
+
         while (token != NULL && i < 99)
         {
             argv[i++] = token;
@@ -97,31 +99,28 @@ int main(void)
         if (argv[0] == NULL)
             continue;
 
-        char *cmd_path;
+        cmd_path = find_command(argv[0]);
 
-cmd_path = find_command(argv[0]);
+        if (cmd_path == NULL)
+        {
+            fprintf(stderr, "%s: command not found\n", argv[0]);
+            continue;
+        }
 
-if (cmd_path == NULL)
-{
-    fprintf(stderr, "%s: command not found\n", argv[0]);
-    continue;
-}
+        pid = fork();
 
-pid = fork();
-
-if (pid == 0)
-{
-    if (execve(cmd_path, argv, environ) == -1)
-    {
-        perror("execve");
-        exit(1);
-    }
-}
-else
-{
-    wait(&status);
-}
-
+        if (pid == 0)
+        {
+            if (execve(cmd_path, argv, environ) == -1)
+            {
+                perror("execve");
+                exit(1);
+            }
+        }
+        else
+        {
+            wait(&status);
+        }
     }
 
     free(line);
