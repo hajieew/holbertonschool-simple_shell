@@ -40,7 +40,7 @@ char *find_command(char *command)
         i++;
     }
 
-    if (path_env == NULL)
+    if (path_env == NULL || path_env[0] == '\0')
         return NULL;
 
     path_copy = strdup(path_env);
@@ -128,7 +128,7 @@ int main(void)
 
         if (cmd_path == NULL)
         {
-            fprintf(stderr, "%s: command not found\n", argv[0]);
+            fprintf(stderr, "./hsh: 1: %s: not found\n", argv[0]);
             continue;
         }
 
