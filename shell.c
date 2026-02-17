@@ -99,6 +99,12 @@ int main(void)
         if (argv[0] == NULL)
             continue;
 
+        if (strcmp(argv[0], "exit") == 0)
+        {
+            free(line);
+            exit(0);
+        }
+
         cmd_path = find_command(argv[0]);
 
         if (cmd_path == NULL)
