@@ -24,9 +24,21 @@ char *find_command(char *command)
         return NULL;
     }
 
-    path_env = getenv("PATH");
-    if (path_env == NULL)
-        return NULL;
+    int i = 0;
+
+    while (environ[i])
+    {
+        if (strncmp(environ[i], "PATH=", 5) == 0)
+        {
+            path_env = environ[i] + 5;
+            break;
+        }
+        i++;
+    }
+
+if (path_env == NULL)
+    return NULL;
+
 
     path_copy = strdup(path_env);
     if (path_copy == NULL)
