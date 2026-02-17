@@ -67,6 +67,21 @@ char *find_command(char *command)
 }
 
 /**
+ * builtin_env - print all environment variables
+ */
+void builtin_env(void)
+{
+	int i;
+
+	i = 0;
+	while (environ[i] != NULL)
+	{
+		printf("%s\n", environ[i]);
+		i++;
+	}
+}
+
+/**
  * main - simple shell
  *
  * Return: last command exit status
@@ -123,6 +138,13 @@ int main(void)
 		{
 			free(line);
 			exit(status);
+		}
+
+		if (strcmp(argv[0], "env") == 0)
+		{
+			builtin_env();
+			status = 0;
+			continue;
 		}
 
 		cmd_path = find_command(argv[0]);
