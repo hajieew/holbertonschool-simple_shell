@@ -7,15 +7,18 @@
 extern char **environ;
 
 /**
- * find_command - finds full path of a command using PATH
+ * find_command - search command in PATH
  * @command: command name
  *
  * Return: full path if found, otherwise NULL
  */
 char *find_command(char *command)
 {
-    char *path_env, *path_copy, *dir;
+    char *path_env;
+    char *path_copy;
+    char *dir;
     static char full_path[1024];
+    int i;
 
     if (strchr(command, '/'))
     {
@@ -24,9 +27,10 @@ char *find_command(char *command)
         return NULL;
     }
 
-    int i = 0;
+    path_env = NULL;
+    i = 0;
 
-    while (environ[i])
+    while (environ[i] != NULL)
     {
         if (strncmp(environ[i], "PATH=", 5) == 0)
         {
@@ -36,9 +40,8 @@ char *find_command(char *command)
         i++;
     }
 
-if (path_env == NULL)
-    return NULL;
-
+    if (path_env == NULL)
+        return NULL;
 
     path_copy = strdup(path_env);
     if (path_copy == NULL)
@@ -64,14 +67,14 @@ if (path_env == NULL)
 }
 
 /**
- * main - simple UNIX shell
+ * main - simple shell
  *
  * Return: Always 0
  */
 int main(void)
 {
-    char *line = NULL;
-    size_t len = 0;
+    char *line;
+    size_t len;
     ssize_t nread;
     pid_t pid;
     int status;
@@ -79,6 +82,9 @@ int main(void)
     char *token;
     int i;
     char *cmd_path;
+
+    line = NULL;
+    len = 0;
 
     while (1)
     {
@@ -103,7 +109,8 @@ int main(void)
 
         while (token != NULL && i < 99)
         {
-            argv[i++] = token;
+            argv[i] = token;
+            i++;
             token = strtok(NULL, " \t");
         }
         argv[i] = NULL;
