@@ -5,6 +5,51 @@
 #include <sys/wait.h>
 
 extern char **environ;
+/**
+ * find_command - finds full path of a command using PATH
+ * @command: command name
+ *
+ * Return: full path if found, otherwise NULL
+ */
+char *find_command(char *command)
+{
+    char *path_env, *path_copy, *dir;
+    static char full_path[1024];
+
+    /* If command contains '/', check directly */
+    if (strchr(command, '/'))
+    {
+        if (access(command, X_OK) == 0)
+            return command;
+        return NULL;
+    }
+
+    path_env = getenv("PATH");
+    if (path_env == NULL)
+        return NULL;
+
+    path_copy = strdup(path_env);
+    if (path_copy == NULL)
+        return NULL;
+
+    dir = strtok(path_copy, ":");
+
+    while (dir != NULL)
+    {
+        snprintf(full_path, sizeof(full_path), "%s/%s", dir, command);
+
+        if (access(full_path, X_OK) == 0)
+        {
+            free(path_copy);
+            return full_path;
+        }
+
+        dir = strtok(NULL, ":");
+    }
+
+    free(path_copy);
+    return NULL;
+}
 
 /**
  * main - simple UNIX shell
@@ -52,20 +97,31 @@ int main(void)
         if (argv[0] == NULL)
             continue;
 
-        pid = fork();
+        char *cmd_path;
 
-        if (pid == 0)
-        {
-            if (execve(argv[0], argv, environ) == -1)
-            {
-                fprintf(stderr, "Command not found\n");
-                exit(1);
-            }
-        }
-        else
-        {
-            wait(&status);
-        }
+cmd_path = find_command(argv[0]);
+
+if (cmd_path == NULL)
+{
+    fprintf(stderr, "%s: command not found\n", argv[0]);
+    continue;
+}
+
+pid = fork();
+
+if (pid == 0)
+{
+    if (execve(cmd_path, argv, environ) == -1)
+    {
+        perror("execve");
+        exit(1);
+    }
+}
+else
+{
+    wait(&status);
+}
+
     }
 
     free(line);
