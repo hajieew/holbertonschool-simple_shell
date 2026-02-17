@@ -85,6 +85,7 @@ int main(void)
 
     line = NULL;
     len = 0;
+    status = 0;
 
     while (1)
     {
@@ -129,6 +130,7 @@ int main(void)
         if (cmd_path == NULL)
         {
             fprintf(stderr, "./hsh: 1: %s: not found\n", argv[0]);
+            status = 127;
             continue;
         }
 
