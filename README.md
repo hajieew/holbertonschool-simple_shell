@@ -1,2 +1,2 @@
 Simple Shell
-Simple Shell is a simple UNIX command interpreter written in C.
+Simple Shell is a  UNIX command interpreter written in C.
