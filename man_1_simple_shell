@@ -1,27 +1,56 @@
-.TH hsh 1 "February 2026" "simple_shell" "User Commands"
+.TH simple_shell 1 "February 2026" "1.0" "Simple Shell Manual"
 
 .SH NAME
-hsh \- simple UNIX command interpreter
+simple_shell \- a simple UNIX command line interpreter
 
 .SH SYNOPSIS
-.B hsh
+.B simple_shell
 
 .SH DESCRIPTION
-hsh is a simple UNIX command interpreter.
+simple_shell is a simple UNIX command line interpreter written in C.
 
-It reads commands from standard input and executes them.
+It reads commands from standard input and executes them using
+fork(2), execve(2), and waitpid(2).
 
-The shell supports both interactive and non-interactive mode.
+The shell supports execution of commands with arguments and
+searches for executables in the PATH environment variable.
 
-.SH USAGE
-Run:
+If the executable is not found, an error message is displayed.
 
-.B ./hsh
+The shell works in both interactive and non-interactive mode.
 
-Type commands and press ENTER.
+.SH BUILTINS
+.TP
+.B exit
+Exit the shell.
+.TP
+.B env
+Print the current environment variables.
 
-Example:
-.B /bin/ls
+.SH RETURN VALUE
+The simple_shell returns the exit status of the last executed command.
 
-.SH AUTHORS
-Written by Aysu Mustafazade, Salim Haciyev
+.SH ENVIRONMENT
+The shell uses the PATH environment variable to search for commands.
+
+.SH EXAMPLES
+Run the shell:
+
+.nf
+$ ./simple_shell
+newshell$ ls
+newshell$ exit
+.fi
+
+Non-interactive mode:
+
+.nf
+$ echo "/bin/ls" | ./simple_shell
+.fi
+
+.SH AUTHOR
+Aysu Mustafazade
+Salim Haciyev
+
+.SH SEE ALSO
+sh(1), bash(1), execve(2), fork(2), waitpid(2)
