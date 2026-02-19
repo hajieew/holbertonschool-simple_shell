@@ -77,7 +77,7 @@ file1.c file2.c
 ```
 
 ## 📂 File Structure
- - **`main.c`**       - Main loop and input handling
+ - **`shell.c`**       - Main loop and input handling
  - **`execute.c`**     - Command execution logic
  - **`path.c`**        - PATH searching logic
  - **`tokenize.c`**    - Command parsing
