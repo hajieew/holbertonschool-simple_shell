@@ -49,6 +49,25 @@ int handle_builtins(char **argv, int *status, char *line)
 }
 
 /**
+ * run_command - finds and executes a command
+ * @argv: argument vector
+ * @status: pointer to exit status
+ */
+void run_command(char **argv, int *status)
+{
+	char *cmd_path;
+
+	cmd_path = find_command(argv[0]);
+	if (cmd_path == NULL)
+	{
+		fprintf(stderr, "./hsh: 1: %s: not found\n", argv[0]);
+		*status = 127;
+		return;
+	}
+	*status = exec_command(argv, cmd_path);
+}
+
+/**
  * main - simple shell
  *
  * Return: last command exit status
@@ -60,7 +79,6 @@ int main(void)
 	ssize_t nread;
 	int status;
 	char *argv[100];
-	char *cmd_path;
 
 	line = NULL;
 	len = 0;
@@ -87,15 +105,7 @@ int main(void)
 		if (handle_builtins(argv, &status, line))
 			continue;
 
-		cmd_path = find_command(argv[0]);
-		if (cmd_path == NULL)
-		{
-			fprintf(stderr, "./hsh: 1: %s: not found\n", argv[0]);
-			status = 127;
-			continue;
-		}
-
-		status = exec_command(argv, cmd_path);
+		run_command(argv, &status);
 	}
 
 	free(line);
