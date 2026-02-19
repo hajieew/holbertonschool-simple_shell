@@ -25,6 +25,30 @@ int parse_line(char *line, char **argv)
 }
 
 /**
+ * handle_builtins - checks and runs builtin commands
+ * @argv: argument vector
+ * @status: current exit status
+ * @line: input line to free if needed
+ *
+ * Return: 1 if builtin ran, 0 otherwise
+ */
+int handle_builtins(char **argv, int *status, char *line)
+{
+	if (strcmp(argv[0], "exit") == 0)
+	{
+		free(line);
+		exit(*status);
+	}
+	if (strcmp(argv[0], "env") == 0)
+	{
+		builtin_env();
+		*status = 0;
+		return (1);
+	}
+	return (0);
+}
+
+/**
  * main - simple shell
  *
  * Return: last command exit status
@@ -45,9 +69,7 @@ int main(void)
 	while (1)
 	{
 		if (isatty(STDIN_FILENO))
-		{
 			write(STDOUT_FILENO, "newshell$ ", 10);
-		}
 
 		nread = getline(&line, &len, stdin);
 		if (nread == -1)
@@ -62,18 +84,8 @@ int main(void)
 		if (parse_line(line, argv) == 0)
 			continue;
 
-		if (strcmp(argv[0], "exit") == 0)
-		{
-			free(line);
-			exit(status);
-		}
-
-		if (strcmp(argv[0], "env") == 0)
-		{
-			builtin_env();
-			status = 0;
+		if (handle_builtins(argv, &status, line))
 			continue;
-		}
 
 		cmd_path = find_command(argv[0]);
 		if (cmd_path == NULL)
